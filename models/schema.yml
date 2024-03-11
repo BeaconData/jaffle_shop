@@ -3,44 +3,69 @@ version: 2
 models:
   - name: customers
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
+    config:
+      contract:
+        enforced: true
 
     columns:
       - name: customer_id
         description: This is a unique identifier for a customer
+        data_type: int
+        constraints:
+          - type: primary_key
+          - type: not_null
         tests:
           - unique
           - not_null
 
       - name: first_name
         description: Customer's first name. PII.
+        data_type: text
 
       - name: last_name
         description: Customer's last name. PII.
+        data_type: text
 
       - name: first_order
         description: Date (UTC) of a customer's first order
+        data_type: date
 
       - name: most_recent_order
         description: Date (UTC) of a customer's most recent order
+        data_type: date
 
       - name: number_of_orders
         description: Count of the number of orders a customer has placed
+        data_type: int
 
       - name: total_order_amount
         description: Total value (AUD) of a customer's orders
+        data_type: numeric
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
+    config:
+      contract:
+        enforced: true
 
     columns:
       - name: order_id
+        data_type: int
+        constraints:
+          - type: primary_key
+          - type: not_null
         tests:
           - unique
           - not_null
         description: This is a unique identifier for an order
 
+
       - name: customer_id
         description: Foreign key to the customers table
+        data_type: int
+        contraints:
+          - type: foreign_key
+            expression: customers.customer_id
         tests:
           - not_null
           - relationships:
@@ -49,25 +74,30 @@ models:
 
       - name: order_date
         description: Date (UTC) that the order was placed
+        data_type: date
 
       - name: status
         description: '{{ doc("orders_status") }}'
+        data_type: text
         tests:
           - accepted_values:
               values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
 
       - name: amount
         description: Total amount (AUD) of the order
+        data_type: numeric
         tests:
           - not_null
 
       - name: credit_card_amount
         description: Amount of the order (AUD) paid for by credit card
+        data_type: numeric
         tests:
           - not_null
 
       - name: coupon_amount
         description: Amount of the order (AUD) paid for by coupon
+        data_type: numeric
         tests:
           - not_null
 
@@ -78,5 +108,6 @@ models:
 
       - name: gift_card_amount
         description: Amount of the order (AUD) paid for by gift card
+        
         tests:
           - not_null
